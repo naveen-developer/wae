@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAE Project</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <h1>WBE</h1>
+    <div>
+        <h2>Movies sites</h2>
+        <div class="inputSearch">
+            <input type="text" placeholder="enter website url" value="" />
+            <select id="siteStatus">
+                <option value="greenFlag">Green Flag</option>
+                <option value="okFlag">Ok Flag</option>
+                <option value="redFlag">Red Flag</option>
+            </select>
+            <button onclick="siteUpdate()">Add</button>
+        </div>
+        <div class="cards">
+
+            <div class="card greenFlag">
+                <a href="https://www.hotstar.com/">Hotstar</a>
+                <button onclick="addeditAction()">Edit</button>
+            </div>
+            <div class="card okFlag"></div>
+            <div class="card redFlag"></div>
+            <div class="card redFlag"></div>
+        </div>
+    </div>
+    <script>
+
+        let siteEditInput = document.querySelector('.inputSearch input');
+        let siteStatus = document.getElementById('siteStatus');
+        let inputBtn = document.querySelector('.inputSearch button');
+
+        let apiURL = 'https://script.google.com/macros/s/AKfycbxYDWV8fnhz25IWTOV6T4iFMmDp634Yl5rJ73SakM4vhbxXNIO71uV6Sh9UADKVRv8/exec';
+
+
+
+
+
+
+        function siteUpdate(editId) {
+            let obj = {
+                site: {
+                    siteURL: siteEditInput.value,
+                    siteStatus: siteStatus.value
+                }
+            }
+
+            if (inputBtn.innerText === 'Add') {
+                if (siteEditInput.value) {
+                    console.log(siteEditInput.value)
+                    console.log(siteStatus.value)
+
+
+                    fetch(apiURL, {
+                        method: "POST",
+                        body: JSON.stringify(obj)
+                    }).then((res) => res.text())
+                        .then((data) => {
+                            alert(data)
+                            readData()
+                        })
+
+                } else {
+                    alert('please enter site name')
+                }
+            } else {
+                console.log("updating status")
+                console.log(editId)
+                console.log(obj)
+                fetch(apiURL + `?update=true&id=${editId}&data=${encodeURIComponent(JSON.stringify(obj))}`)
+                    .then(res => res.text())
+                    .then(data => {
+                        readData();
+                        alert(data);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+
+
+        }
+
+
+
+
+
+
+
+        function addeditAction(id, siteURL, stautsSite) {
+            //alert('edit button activated ' + url);
+            console.log("siteURL", siteURL)
+            console.log("stautsSite", stautsSite)
+            siteEditInput.value = siteURL;
+            siteStatus.value = stautsSite;
+            inputBtn.innerText = 'Update';
+            inputBtn.setAttribute("onclick", `siteUpdate(${id})`);
+        }
+
+
+        function getWebsiteTitle(url) {
+            const regex = /www\.(.+?)\.com/;
+            const match = url.match(regex);
+            return match ? match[1] : null;
+        }
+
+
+
+        function readData(sheet = "sheet2") { // Default to "sheet1"
+            const api = `${apiURL}?sheet=${sheet}`; // Adjust your API URL accordingly
+            console.log(api)
+            fetch(api)
+                .then((res) => res.json())
+                .then(data => {
+                    console.log(data);
+                    let sites = data.sites;
+                    let html = sites.map((each) => {
+                        console.log(each)
+                        const title = getWebsiteTitle(each[1]);
+                        return `<div class="card ${each[2]}">
+                <a href="${each[1]}">${title}</a>
+                <button onclick="addeditAction('${each[0]}','${each[1]}', '${each[2]}')">Edit</button>
+            </div>
+                `;
+                    });
+                    document.querySelector('.cards').innerHTML = html;
+                });
+        }
+
+
+        readData()
+
+
+    </script>
+</body>
+
+</html>
