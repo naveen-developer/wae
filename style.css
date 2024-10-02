@@ -24,7 +24,7 @@ button {
     justify-content: flex-start;
     align-items: center;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 0 20px;
 }
 
 .card {
@@ -59,4 +59,8 @@ button {
 .inputSearch {
     text-align: center;
     margin: 2rem 0;
+}
+
+.inputSearch input {
+    margin: 15px 0;
 }
