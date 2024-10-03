@@ -112,9 +112,13 @@
 
 
         function getWebsiteTitle(url) {
-            const regex = /www\.(.+?)\.com/;
-            const match = url.match(regex);
-            return match ? match[1] : null;
+            // Remove the protocol (https:// or http://)
+            const cleanUrl = url.replace(/^https?:\/\//, '');
+            // Get the part after "www." if present
+            const withoutWww = cleanUrl.replace(/^www\./, '');
+            // Get the part before the first dot
+            const title = withoutWww.split('.')[0];
+            return title;
         }
 
 
